@@ -3,7 +3,6 @@ package org.insa.graphs.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Iterator;
 
 /**
  * <p>
@@ -56,12 +55,30 @@ public class Path {
      */
     public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
+        if(nodes.size()==1){
+            return new Path(graph, nodes.get(0));
+        }
         List<Arc> arcs = new ArrayList<Arc>();
-        // TODO:
-        
 
+        for(int i = 0; i <nodes.size()-1; i++) {
+            double shortest = Double.MAX_VALUE;
+            Arc best = null;
+            for (Arc arc : nodes.get(i).getSuccessors()){
+                if(arc.getDestination()==nodes.get(i+1) && arc.getLength()<shortest){
+                    shortest = arc.getLength();
+                    best = arc;
+                }
+            }
+            if(best==null){
+                throw new IllegalArgumentException("Liste non valide");
+            }else{
+                arcs.add(best);
+            }
+        }
+    
         return new Path(graph, arcs);
     }
+    
 
     /**
      * Concatenate the given paths.
