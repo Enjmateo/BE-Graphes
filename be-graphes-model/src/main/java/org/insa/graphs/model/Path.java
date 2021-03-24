@@ -201,6 +201,7 @@ public class Path {
      * @deprecated Need to be implemented.
      */
     public boolean isValid() {
+
         return false;
     }
 
@@ -211,7 +212,7 @@ public class Path {
      * 
      */
     public float getLength() {
-        double sum = 0.0;
+        float sum = 0;
         for(Arc arc : this.arcs) sum += arc.getLength();
         return sum;
     }
