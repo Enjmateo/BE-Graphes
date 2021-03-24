@@ -9,7 +9,7 @@ import java.util.ArrayList;
  *
  * @param <Observer> Observer type for the algorithm.
  */
-//com
+//com bhjcdhqjdhqsjdh
 public abstract class AbstractAlgorithm<Observer> {
 
     // Input data for the algorithm
