@@ -3,6 +3,7 @@ package org.insa.graphs.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * <p>
@@ -57,6 +58,8 @@ public class Path {
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
         // TODO:
+        
+
         return new Path(graph, arcs);
     }
 
@@ -198,11 +201,13 @@ public class Path {
      * 
      * @return true if the path is valid, false otherwise.
      * 
-     * @deprecated Need to be implemented.
      */
     public boolean isValid() {
-
-        return false;
+        if(this.isEmpty() || this.arcs.size()==0) return true;
+        for(int i = 0; i <arcs.size()-1; i++) {
+            if(arcs.get(i).getDestination()!=arcs.get(i+1).getOrigin()) return false;
+        }
+        return true;
     }
 
     /**
