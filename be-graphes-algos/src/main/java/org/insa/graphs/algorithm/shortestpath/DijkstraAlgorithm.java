@@ -44,6 +44,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             marque = true;
         }
 
+        public Node getFather() {
+            return this.pere;
+        }
+
         public boolean isMarked() {
             return this.marque;
         }
@@ -53,7 +57,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         }
 
         public int compareTo(Label other){
-            return Float.compare(cout, other.getCost())
+            return Float.compare(cout, other.getCost());
         }
     }
 
@@ -77,16 +81,17 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         HashMap<Node, Label> map= new HashMap<Node, Label>();
 
         for (Node node : graph.getNodes()){
-            map.put(node,null);
+            map.put(node,new Label(node, Float.MAX_VALUE, null));
         }
         Label label = new Label(origine, 0, null);
         map.put(origine,label);
         labels.insert(label);
         while(true){
             Label min = labels.deleteMin();
+            Node nodeMin = min.getSommet();
             min.setMarked();
-            
-            for(Arc arc : min.getSommet().getSuccessors()){
+            if(nodeMin == destination) break;
+            for(Arc arc : nodeMin.getSuccessors()){
                 Node node = arc.getDestination();
                 label = map.get(node);
                 if(!label.isMarked()){
@@ -100,10 +105,19 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
             }
         }
-        
 
+        ArrayList<Node> path = new ArrayList<Node>();
+        path.add(destination);
+        while(true){
+            Node pere = map.get(path.get(path.size() - 1)).getFather();
+            path.add(pere);
+            if(pere==origine) break;
+        }
 
-        ShortestPathSolution solution = null;
+        Collections.reverse(path);
+        Path chemin = Path.createShortestPathFromNodes(graph, path);
+
+        ShortestPathSolution solution = new ShortestPathSolution(data, Status.OPTIMAL, chemin);
         // TODO:
         return solution;
     }
