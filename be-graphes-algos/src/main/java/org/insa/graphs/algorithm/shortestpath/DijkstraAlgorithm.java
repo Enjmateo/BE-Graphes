@@ -82,17 +82,17 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         for (Node node : graph.getNodes()){
             map.put(node,new Label(node, Float.MAX_VALUE, null));
         }
-        Label label = new Label(origine, 0, null);
-        map.put(origine,label);
-        labels.insert(label);
+        Label min = map.get(origine);
+        min.setCost(0);
+        labels.insert(min);
         while(true){
-            Label min = labels.deleteMin();
+            min = labels.deleteMin();
             Node nodeMin = min.getSommet();
             min.setMarked();
             if(nodeMin == destination) break;
             for(Arc arc : nodeMin.getSuccessors()){
                 Node node = arc.getDestination();
-                label = map.get(node);
+                Label label = map.get(node);
                 if(!label.isMarked()){
                     float cost = min.getCost()+arc.getLength();
                     if(label.getCost()>cost){
@@ -103,6 +103,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 }
 
             }
+            if(labels.isEmpty()) return new ShortestPathSolution(data, Status.INFEASIBLE); //si il n'y a pas de solutions
         }
 
         ArrayList<Node> path = new ArrayList<Node>();
