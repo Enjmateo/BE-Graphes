@@ -1,7 +1,6 @@
 package org.insa.graphs.algorithm.shortestpath;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -78,7 +77,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             // TODO
         }
         BinaryHeap<Label> labels = new BinaryHeap<Label>();
-        HashMap<Node, Label> map= new HashMap<Node, Label>();
+        HashMap<Node, Label> map = new HashMap<Node, Label>();
 
         for (Node node : graph.getNodes()){
             map.put(node,new Label(node, Float.MAX_VALUE, null));
