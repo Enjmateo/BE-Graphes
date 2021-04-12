@@ -17,7 +17,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     class Label implements Comparable<Label> {
         Node sommetCourant;
         boolean marque;
-        float cout;
+        double cout;
         Node pere;
 
         public Label(Node sommetCourant, float cout, Node pere) {
@@ -27,7 +27,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             this.pere = pere;
         }
 
-        public float getCost(){
+        public double getCost(){
             return this.cout;
         }
 
@@ -35,7 +35,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             return this.sommetCourant;
         }
 
-        public void setCost(float cost){
+        public void setCost(double cost){
             this.cout = cost;
         }
 
@@ -56,7 +56,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         }
 
         public int compareTo(Label other){
-            return Float.compare(cout, other.getCost());
+            return Double.compare(cout, other.getCost());
         }
     }
 
@@ -72,7 +72,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         Node origine = data.getOrigin();
         Node destination = data.getDestination();
         Graph graph = data.getGraph();
-
+        notifyOriginProcessed(origine);
         if(origine==destination){
             // TODO
         }
@@ -89,22 +89,30 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             min = labels.deleteMin();
             Node nodeMin = min.getSommet();
             min.setMarked();
+            notifyNodeMarked(nodeMin);
             if(nodeMin == destination) break;
             for(Arc arc : nodeMin.getSuccessors()){
+                if(!data.isAllowed(arc)) continue;
                 Node node = arc.getDestination();
                 Label label = map.get(node);
                 if(!label.isMarked()){
-                    float cost = min.getCost()+arc.getLength();
+                    double cost = min.getCost()+data.getCost(arc);
                     if(label.getCost()>cost){
+                        if(label.getCost()==Float.MAX_VALUE) {
+                            notifyNodeReached(node);
+                        }else{
+                            labels.remove(label);
+                        }
                         label.setCost(cost);
                         labels.insert(label);
                         label.setFather(min.getSommet());
                     }
                 }
-
             }
             if(labels.isEmpty()) return new ShortestPathSolution(data, Status.INFEASIBLE); //si il n'y a pas de solutions
         }
+
+        notifyDestinationReached(destination);
 
         ArrayList<Node> path = new ArrayList<Node>();
         path.add(destination);
@@ -118,7 +126,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         Path chemin = Path.createShortestPathFromNodes(graph, path);
 
         ShortestPathSolution solution = new ShortestPathSolution(data, Status.OPTIMAL, chemin);
-        // TODO:
         return solution;
     }
 
