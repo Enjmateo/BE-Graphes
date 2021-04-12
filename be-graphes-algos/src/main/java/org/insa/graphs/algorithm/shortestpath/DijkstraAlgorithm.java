@@ -20,7 +20,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         double cout;
         Node pere;
 
-        public Label(Node sommetCourant, float cout, Node pere) {
+        public Label(Node sommetCourant, double cout, Node pere) {
             this.sommetCourant = sommetCourant;
             this.marque = false;
             this.cout = cout;
@@ -64,6 +64,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         super(data);
     }
 
+    protected Label createLabel(Node node, double cost){
+        return new Label(node, cost, null); 
+    }
+
 
     @Override
     protected ShortestPathSolution doRun() {
@@ -78,7 +82,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         HashMap<Node, Label> map = new HashMap<Node, Label>();
 
         for (Node node : graph.getNodes()){
-            map.put(node,new Label(node, Float.MAX_VALUE, null));
+            map.put(node,createLabel(node,Float.MAX_VALUE));
         }
         Label min = map.get(origine);
         min.setCost(0);
@@ -96,7 +100,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 Label label = map.get(node);
                 if(!label.isMarked()){
                     double cost = min.getCost()+data.getCost(arc);
-                    if(label.getCost()>cost){
+                    if(label.compareTo(createLabel(node, cost))==1){
                         if(label.getCost()==Float.MAX_VALUE) {
                             notifyNodeReached(node);
                         }else{
