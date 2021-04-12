@@ -73,7 +73,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         Node destination = data.getDestination();
         Graph graph = data.getGraph();
         notifyOriginProcessed(origine);
-        if(origine==destination) return new ShortestPathSolution(data, Status.INFEASIBLE);
+        if(origine==destination) return new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, origine));
         BinaryHeap<Label> labels = new BinaryHeap<Label>();
         HashMap<Node, Label> map = new HashMap<Node, Label>();
 
