@@ -73,9 +73,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         Node destination = data.getDestination();
         Graph graph = data.getGraph();
         notifyOriginProcessed(origine);
-        if(origine==destination){
-            // TODO
-        }
+        if(origine==destination) return new ShortestPathSolution(data, Status.INFEASIBLE);
         BinaryHeap<Label> labels = new BinaryHeap<Label>();
         HashMap<Node, Label> map = new HashMap<Node, Label>();
 
@@ -85,9 +83,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         Label min = map.get(origine);
         min.setCost(0);
         labels.insert(min);
+        Node nodeMin;
         while(true){
             min = labels.deleteMin();
-            Node nodeMin = min.getSommet();
+            nodeMin = min.getSommet();
             min.setMarked();
             notifyNodeMarked(nodeMin);
             if(nodeMin == destination) break;
@@ -123,8 +122,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         }
 
         Collections.reverse(path);
+        //for(Node node : path) System.out.println(Double.toString(map.get(node).getCost())); //test des couts croissants
         Path chemin = Path.createShortestPathFromNodes(graph, path);
-
+        //System.out.println("Node min : "+Double.toString(map.get(nodeMin).getCost())+" Cout chemin : "+chemin.getLength());
         ShortestPathSolution solution = new ShortestPathSolution(data, Status.OPTIMAL, chemin);
         return solution;
     }
