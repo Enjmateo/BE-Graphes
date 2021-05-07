@@ -43,7 +43,10 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
         super(data);
         destination = data.getDestination();
         mode = data.getMode();
-        maxSpeed = (double)data.getGraph().getGraphInformation().getMaximumSpeed()/3.6;
+        maxSpeed = (double)data.getMaximumSpeed()/3.6;
+        if(maxSpeed < 0 ){
+            maxSpeed = (double)data.getGraph().getGraphInformation().getMaximumSpeed()/3.6;
+        }
     }
 
 }
