@@ -100,7 +100,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 Label label = map.get(node);
                 if(!label.isMarked()){
                     double cost = min.getCost()+data.getCost(arc);
-                    if(label.compareTo(createLabel(node, cost))==1){
+                    if(label.getCost() > cost){
                         if(label.getCost()==Float.MAX_VALUE) {
                             notifyNodeReached(node);
                         }else{

@@ -8,6 +8,7 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
     Node destination;
     Mode mode;
     double maxSpeed;
+
     class LabelAstar extends Label {
         double heuristique;
         public LabelAstar(Node sommetCourant, double cout, Node pere, Node destination, Mode mode, double maxSpeed) {
@@ -28,9 +29,12 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
 
         @Override
         public int compareTo(Label other){
-            double heuristicSelf = cout + heuristique;
-            double heuristicOther = other.getCost() + ((LabelAstar)other).getHeuristique();         
-            return Double.compare(heuristicSelf, heuristicOther);
+            double totalCostSelf = cout + heuristique;
+            double totalCostOther = other.getCost() + ((LabelAstar)other).getHeuristique();
+            if(totalCostSelf==totalCostOther) {
+                return Double.compare(heuristique,((LabelAstar)other).getHeuristique());
+            }
+            return Double.compare(totalCostSelf, totalCostOther);
         }
     }
 
