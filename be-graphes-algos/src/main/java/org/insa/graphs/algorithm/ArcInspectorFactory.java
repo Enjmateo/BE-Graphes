@@ -20,7 +20,7 @@ public class ArcInspectorFactory {
 
         // Common filters:
 
-        // No filter (all arcs allowed):
+        // No filter and distance (all arcs allowed):
         filters.add(new ArcInspector() {
             @Override
             public boolean isAllowed(Arc arc) {
@@ -78,7 +78,7 @@ public class ArcInspectorFactory {
             }
         });
 
-        // Only road allowed for cars and time:
+        // No filter and fastest (all arcs allowed):
 
         filters.add(new ArcInspector() {
             @Override
@@ -106,6 +106,8 @@ public class ArcInspectorFactory {
                 return "Fastest path, all roads allowed";
             }
         });
+
+        // Only road allowed for cars and time:
 
         filters.add(new ArcInspector() {
             @Override
