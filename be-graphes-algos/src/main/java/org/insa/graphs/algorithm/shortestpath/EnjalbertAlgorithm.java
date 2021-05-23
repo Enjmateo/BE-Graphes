@@ -14,7 +14,7 @@ import org.insa.graphs.model.Path;
 
 public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
 
-    static final double AUTONOMIE_MAX = 50000.0;
+    static final double AUTONOMIE_MAX = 200000.0;
     static final double STATION_PERCENTAGE = 0.01;
     HashMap<Node, Label> map;
     Node origine;
@@ -203,7 +203,6 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
 
         Label min = map.get(lastOrigine);
         min.setCost(0);
-        //min.setFather(min.getSommet()); //????
 
         labels.insert(min);
         Node nodeMin;
@@ -217,7 +216,6 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
                     return null;
                 }
                 LabelStation meilleureStationLabel=stations.deleteMin();
-                //meilleureStationLabel.stationMarked =  true;
                 Node meilleureStation = meilleureStationLabel.label.sommetCourant;
                 notifyStationFill(meilleureStation);
                 path.add(meilleureStation);
