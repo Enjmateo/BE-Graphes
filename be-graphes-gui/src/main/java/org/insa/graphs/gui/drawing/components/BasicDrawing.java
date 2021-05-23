@@ -110,7 +110,7 @@ public class BasicDrawing extends JPanel implements Drawing {
 
     };
 
-    private class BasicMarkerOverlay extends BasicOverlay implements MarkerOverlay {
+    public class BasicMarkerOverlay extends BasicOverlay implements MarkerOverlay {
 
         // Marker width and height
         public static final int MARKER_WIDTH = 30, MARKER_HEIGHT = 60;

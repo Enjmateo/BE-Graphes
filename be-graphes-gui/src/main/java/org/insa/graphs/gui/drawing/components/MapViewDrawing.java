@@ -258,11 +258,13 @@ public class MapViewDrawing extends MapView implements Drawing {
 
         @Override
         public void addPoint(Point point) {
-            points.add(point);
-            this.points = convexHull(points);
-            polygon.setPoints(this.points.stream().map(MapViewDrawing.this::convertPoint)
-                    .collect(Collectors.toList()));
-            polygon.requestRedraw();
+            if (!points.contains(point)){
+                points.add(point);
+                this.points = convexHull(points);
+                polygon.setPoints(this.points.stream().map(MapViewDrawing.this::convertPoint)
+                        .collect(Collectors.toList()));
+                polygon.requestRedraw();
+            }
         }
 
         @Override

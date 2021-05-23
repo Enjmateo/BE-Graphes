@@ -66,4 +66,26 @@ public abstract class ShortestPathAlgorithm extends AbstractAlgorithm<ShortestPa
             obs.notifyDestinationReached(node);
         }
     }
+
+    /**
+     * Notify all observers that the car is refilling its tank/battery
+     * 
+     * @param node Station used.
+     */
+    public void notifyStationFill(Node node) {
+        for (ShortestPathObserver obs: getObservers()) {
+            obs.notifyStationFill(node);
+        }
+    }
+
+    /**
+     * Notify all observers that there is a station a this place
+     * 
+     * @param node Station.
+     */
+    public void notifyStation(Node node) {
+        for (ShortestPathObserver obs: getObservers()) {
+            obs.notifyStation(node);
+        }
+    }
 }

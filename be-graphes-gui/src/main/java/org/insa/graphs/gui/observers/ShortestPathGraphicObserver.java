@@ -6,6 +6,8 @@ import org.insa.graphs.algorithm.shortestpath.ShortestPathObserver;
 import org.insa.graphs.gui.drawing.Drawing;
 import org.insa.graphs.gui.drawing.overlays.PointSetOverlay;
 import org.insa.graphs.model.Node;
+import org.insa.graphs.gui.drawing.Drawing.AlphaMode;
+
 
 public class ShortestPathGraphicObserver implements ShortestPathObserver {
 
@@ -37,6 +39,16 @@ public class ShortestPathGraphicObserver implements ShortestPathObserver {
     @Override
     public void notifyDestinationReached(Node node) {
         // drawing.drawMarker(node.getPoint(), Color.RED);
+    }
+
+    @Override
+    public void notifyStationFill(Node node) {
+        drawing.drawMarker(node.getPoint(),Color.CYAN ,Color.CYAN, AlphaMode.TRANSPARENT);
+    }
+
+    @Override
+    public void notifyStation(Node node) {
+        drawing.drawMarker(node.getPoint(),Color.GRAY ,Color.GRAY, AlphaMode.TRANSPARENT);
     }
 
 }

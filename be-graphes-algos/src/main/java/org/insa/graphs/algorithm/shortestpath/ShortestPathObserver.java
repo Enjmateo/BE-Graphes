@@ -33,5 +33,19 @@ public interface ShortestPathObserver {
 	 * @param node Destination.
 	 */
 	public void notifyDestinationReached(Node node);
+
+	/**
+     * Notify the observer that the car is refilling its tank/battery
+     * 
+     * @param node Station used.
+     */
+	public void notifyStationFill(Node node);
+
+	/**
+     * Notify the observer that there is a station a this place
+     * 
+     * @param node Station.
+     */
+	public void notifyStation(Node node);
 	
 }

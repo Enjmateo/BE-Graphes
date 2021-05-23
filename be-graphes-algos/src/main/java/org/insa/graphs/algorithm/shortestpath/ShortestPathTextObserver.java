@@ -34,4 +34,13 @@ public class ShortestPathTextObserver implements ShortestPathObserver {
 
     }
 
+    @Override
+    public void notifyStationFill(Node node) {
+        
+    }
+
+    @Override
+    public void notifyStation(Node node) {
+        
+    }
 }
