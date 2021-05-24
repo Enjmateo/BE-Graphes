@@ -67,4 +67,11 @@ public abstract class Arc {
      * @return Points representing segments of this arc.
      */
     public abstract List<Point> getPoints();
+
+    /**
+     * @return Maximum speed of this arc.
+     */
+    public double getMaximumSpeed(){
+        return getRoadInformation().getMaximumSpeed();
+    }
 }
