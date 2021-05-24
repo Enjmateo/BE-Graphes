@@ -43,7 +43,6 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
         double usedAutonomy;
 
         boolean isStation;
-        boolean isReachable;
         boolean marque;
 
         Mode mode;
@@ -54,9 +53,8 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
             this.pere = null;
 
             this.cout = Double.MAX_VALUE;
-            this.usedAutonomy = Double.MAX_VALUE;
+            this.usedAutonomy = 0;
 
-            this.isReachable = false;
             this.isStation = false;
             this.marque = false;
 
@@ -89,10 +87,10 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
         public Node getFather() {
             return this.pere;
         }
-
-        public boolean isReachable() {
-            return isReachable;
+        public double getUsedAutonomy(){
+            return usedAutonomy;
         }
+
         public boolean isMarked() {
             return this.marque;
         }
@@ -113,10 +111,10 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
         public void setFather(Node father){
             this.pere = father;
         }
-        public void setReachability(boolean reachability){
-            this.isReachable = reachability;
+        public void setUsedAutonomy(double usedAutonomy){
+            this.usedAutonomy = usedAutonomy;
         }
-
+        
         public int compareTo(Label other){
             return Double.compare(cout, other.getCost());
             /*
@@ -189,6 +187,7 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
             maxSpeed = (double)data.getGraph().getGraphInformation().getMaximumSpeed()/3.6;
         }
     }
+
     public Node findClosestNode(Point point) {
         Node minNode = null;
         double minDis = Double.POSITIVE_INFINITY;
@@ -323,8 +322,6 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
         Path cheminComplet = new Path(graph,origine);
         Node dernier = origine;
         do{
-            //On trouve les nodes atteignables avec notre autonomie :
-            finReacheables(dernier);
             //Parmis ces nodes on calcule les couts de chacunes 
             Path chemin = findNextStep(dernier);
             if(chemin==null)  return new ShortestPathSolution(data, Status.INFEASIBLE); //si il n'y a pas de solutions
@@ -339,81 +336,23 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
 
     protected void resetLabels(){
         for ( Label label : labelsMap.values()){
-            label.setCost(Float.MAX_VALUE);
+            label.setCost(Double.MAX_VALUE);
             label.setFather(null);
             label.setMarked(false);
+            label.setUsedAutonomy(0);
         }
-    }
-
-    protected void resetReachability(){
-        for (Label label : labelsMap.values()){
-            label.setReachability(false);
-        }
-    }
-
-    //Marque toutes les nodes atteignables (isReachable = true) 
-    protected void finReacheables(Node localOrigine){
-        BinaryHeap<Label> labels = new BinaryHeap<Label>();
-        resetLabels();
-        resetReachability();
-
-        Label min = labelsMap.get(localOrigine);
-        min.setCost(0);
-        labels.insert(min);
-
-        Node nodeMin;
-        while(true){
-            min = labels.deleteMin();
-            nodeMin = min.getSommet();
-            min.setMarked(true);
-            if(min.getCost()>MAX_AUTONOMY) break;
-            notifyNodeMarked(nodeMin);
-
-            min.setReachability(true);
-
-            for(Arc arc : nodeMin.getSuccessors()){
-                if(!data.isAllowed(arc)) continue;
-                Node node = arc.getDestination();
-                Label label = labelsMap.get(node);
-                if(!label.isMarked()){
-                    double cost = min.getCost()+autonomyUsed(arc);
-                    if(label.getCost() > cost){
-                        if(label.getCost()==Float.MAX_VALUE) {
-                            notifyNodeReached(node);
-                        }else{
-                            labels.remove(label);
-                        }
-                        label.setCost(cost);
-                        labels.insert(label);
-                        label.setFather(min.getSommet());
-                    }
-                }
-            }
-            if(labels.isEmpty()) break;
-        }
-    }
-
-    protected int countReacheablesPotentialObjectives(){
-        int count = 0;
-        for(LabelStation label : stationsMap.values()){
-            if(label.getLabel().isReachable()&&!label.isMarked()) count++;
-        }
-        if(labelsMap.get(destination).isReachable())count++;
-        return count;
     }
 
     protected Path findNextStep(Node lastOrigine) {
         BinaryHeap<Label> labels = new BinaryHeap<Label>();
         BinaryHeap<LabelStation> stationsReached = new BinaryHeap<LabelStation>();
         ArrayList<Node> path = new ArrayList<Node>();
-        int potentialObjectivesReached = 0;
-        int potentialObjectivesReachable = countReacheablesPotentialObjectives();
 
         resetLabels();
 
         Label min = labelsMap.get(lastOrigine);
         min.setCost(0);
-
+        min.setUsedAutonomy(0);
         labels.insert(min);
         Node nodeMin;
         while(true){
@@ -429,10 +368,8 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
                 path.add(destination);
                 break;
             }
-            if(potentialObjectivesReached == potentialObjectivesReachable) break;
 
             if(min.isStation()&& !stationsMap.get(min).isMarked()) {
-                potentialObjectivesReached++;
                 stationsReached.insert(stationsMap.get(min));
                 notifyStation(min.getSommet());//Notifiaction ici comme cela on montre que les atteignables
                 System.out.print("+");
@@ -441,19 +378,24 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
             for(Arc arc : nodeMin.getSuccessors()){
                 if(!data.isAllowed(arc)) continue;
                 Node node = arc.getDestination();
-                if(!labelsMap.get(node).isReachable){
-                    continue;
-                }
                 Label label = labelsMap.get(node);
+
                 if(!label.isMarked()){
+                    double usedAutonomy = min.getUsedAutonomy() + autonomyUsed(arc);
+                    if(usedAutonomy>MAX_AUTONOMY) {
+                        continue;
+                    }
+                    
                     double cost = min.getCost()+data.getCost(arc);
+
                     if(label.getCost() > cost){
-                        if(label.getCost()==Float.MAX_VALUE) {
+                        if(label.getCost()==Double.MAX_VALUE) {
                             notifyNodeReached(node);
                         }else{
                             labels.remove(label);
                         }
                         label.setCost(cost);
+                        label.setUsedAutonomy(usedAutonomy);
                         labels.insert(label);
                         label.setFather(min.getSommet());
                     }
