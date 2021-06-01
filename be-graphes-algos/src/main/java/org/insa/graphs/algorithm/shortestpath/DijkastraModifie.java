@@ -18,7 +18,7 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
+public class DijkastraModifie extends ShortestPathAlgorithm {
 
     static final double MAX_AUTONOMY = 75000.0;
     static final double STATION_PERCENTAGE = 0.03;
@@ -88,7 +88,8 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
             return this.pere;
         }
         public double getUsedAutonomy(){
-            return usedAutonomy;
+            if(!this.isStation) return usedAutonomy;
+            return 0;
         }
 
         public boolean isMarked() {
@@ -153,7 +154,7 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
         public int compareTo(LabelStation other){
             double totalCostSelf;
             double totalCostOther;
-            if(EnjalbertAlgorithm.mode == Mode.LENGTH){
+            if(DijkastraModifie.mode == Mode.LENGTH){
                 totalCostSelf = label.cout + FACTOR_HEUR_LENGTH*label.heuristique;
                 totalCostOther = other.label.cout + FACTOR_HEUR_LENGTH*other.label.heuristique;
             }else{
@@ -179,7 +180,7 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
         return new Label(node, destination, mode, maxSpeed); 
     }
 
-    public EnjalbertAlgorithm(ShortestPathData data) {
+    public DijkastraModifie(ShortestPathData data) {
         super(data);
         mode = data.getMode();
         maxSpeed = (double)data.getMaximumSpeed()/3.6;
@@ -279,11 +280,12 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
         String station;
 
         try {
-            reader = new BufferedReader(new FileReader("D:\\home\\Documents\\Travail\\INSA\\3A\\BE-Graphes\\StationsMydPyr.txt"));
+            reader = new BufferedReader(new FileReader("D:\\home\\Documents\\Travail\\INSA\\3A\\BE-Graphes\\StationsMidPyr.txt"));
             while ((station = reader.readLine()) != null) {
                 Integer id = Integer.parseInt(station);
                 if(id == null) continue;
                 Node node = graph.get(id);
+                notifyStation(node);//Notifiaction ici comme cela on montre que les atteignables
                 Label label = labelsMap.get(node);
                 label.setStation();
                 //notifyStation(node); //TROP COUTEUX EN RESSOURCES
@@ -345,7 +347,6 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
 
     protected Path findNextStep(Node lastOrigine) {
         BinaryHeap<Label> labels = new BinaryHeap<Label>();
-        BinaryHeap<LabelStation> stationsReached = new BinaryHeap<LabelStation>();
         ArrayList<Node> path = new ArrayList<Node>();
 
         resetLabels();
@@ -367,12 +368,6 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
                 notifyDestinationReached(destination);
                 path.add(destination);
                 break;
-            }
-
-            if(min.isStation()&& !stationsMap.get(min).isMarked()) {
-                stationsReached.insert(stationsMap.get(min));
-                notifyStation(min.getSommet());//Notifiaction ici comme cela on montre que les atteignables
-                System.out.print("+");
             }
             
             for(Arc arc : nodeMin.getSuccessors()){
@@ -405,18 +400,13 @@ public class EnjalbertAlgorithm extends ShortestPathAlgorithm {
 
         //Si on est pas déjà arrivé à l'arrivée on récupère la meilleure station
         if(path.size()==0){
-            if (stationsReached.isEmpty()){
-                System.out.println("Autonomie max atteinte : "+min.getCost());
-                return null;
-            }
-            LabelStation meilleureStationLabel=stationsReached.deleteMin();
-            meilleureStationLabel.setMarked(true);
-            Node meilleureStation = meilleureStationLabel.getNode();
-            notifyStationFill(meilleureStation);
-            path.add(meilleureStation);
+            System.out.println("Autonomie max atteinte : "+min.getCost());
+            return null;
         }
         while(true){
-            Node pere = labelsMap.get(path.get(path.size() - 1)).getFather();
+            Label labelPere = labelsMap.get(path.get(path.size() - 1));
+            Node pere = labelPere.getFather();
+            if(labelPere.isStation()) notifyStationFill(pere);
             path.add(pere);
             if(pere==lastOrigine) break;
         }
